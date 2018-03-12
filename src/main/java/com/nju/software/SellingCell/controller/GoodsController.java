@@ -1,6 +1,7 @@
 package com.nju.software.SellingCell.controller;
 
 import com.nju.software.SellingCell.controller.vo.Goods;
+import com.nju.software.SellingCell.controller.vo.Result;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -11,15 +12,15 @@ public class GoodsController {
 
     @RequestMapping(value="api/goodInfo/{goodId}",method= RequestMethod.GET)
     public Object findGoodInfo(@PathVariable String goodId){
-        HashMap<String,Object> result= new HashMap<String,Object>();
+        Result result=new Result();
         Goods goods=new Goods();
         goods.setTitle("Head First Java");
         goods.setImg("img/goods/xxxx");
         goods.setDetail("no detail");
         goods.setIntroduction("This is a book about java");
         goods.setPrice(56.8);
-        result.put("success",true);
-        result.put("data",goods);
+        result.setSuccess(true);
+        result.setData(goods);
         return result;
     }
 
