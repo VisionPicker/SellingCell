@@ -5,6 +5,12 @@
 <configuration>
     <typeAliases>
         <typeAlias type="com.nju.software.SellingCell.data.entity.User" alias="User" />
+        <typeAlias type="com.nju.software.SellingCell.data.entity.Goods" alias="Goods"/>
+        <typeAlias type="com.nju.software.SellingCell.controller.vo.GoodsVO" alias="GoodsVO"/>
+        <typeAlias type="com.nju.software.SellingCell.dto.GoodsDTO" alias="GoodsDTO"/>
+        <typeAlias type="com.nju.software.SellingCell.data.entity.ShoppingCartItem" alias="CartItem"/>
+        <typeAlias type="com.nju.software.SellingCell.controller.vo.ShoppingCartItemVO" alias="CartItemVO" />
+        <typeAlias type="com.nju.software.SellingCell.data.entity.OrderItem" alias="OrderItem"/>
     </typeAliases>
 
 </configuration>

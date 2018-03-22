@@ -1,27 +1,30 @@
 package com.nju.software.SellingCell.service;
 
-import com.nju.software.SellingCell.controller.vo.Goods;
+import com.nju.software.SellingCell.controller.vo.GoodsVO;
 import com.nju.software.SellingCell.dto.GoodsDTO;
 
 import java.util.List;
 
 public interface GoodsService {
 
-    public List<GoodsDTO> getAllGoodsIntroByVisitorView();
+    public List<GoodsVO> getAllGoodsIntroByVisitorView();
 
     public List<GoodsDTO> getAllGoodsIntroByCustomerView(int customerId);
 
-    public List<GoodsDTO> getAllGoodsIntroBySellerView(int sellerId);
+    public List<GoodsDTO> getAllGoodsIntroBySellerView();
 
     public GoodsDTO getGoodsDetailInfo(int goodsId);
 
-    public boolean putOnGoods(Goods goods);
+    public int putOnGoods(int sellerid,GoodsVO goods);
 
-    public boolean putOffGoods(int goodsId);
+    public GoodsDTO getGoodsDetailInfoByCustomer(int goodsid,int customerid);
 
-    public boolean modifyGoodsDetailInfo(Goods goods);
+    public boolean putOffGoods(int goodsId,int sellerid);
+
+    public boolean modifyGoodsDetailInfo(GoodsVO goods);
 
     public List<GoodsDTO> getGoodsIntroByNotPurchasedView(int customerId);
 
     public List<GoodsDTO> getGoodsIntroByPurchasedView(int customerId);
+
 }

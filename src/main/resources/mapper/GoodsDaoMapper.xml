@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nju.software.SellingCell.data.GoodsDao">
+    <insert id="insertGoods" parameterType="Goods" useGeneratedKeys="true" keyProperty="goodsid">
+        insert into goods(title,introduction,detail,sellerid,image,price)
+            values (#{title},#{introduction},#{detail},#{sellerid},#{image},#{price})
+    </insert>
+    
+    <select id="selectGoods" parameterType="INT" resultType="Goods">
+        select * from goods where goodsid=#{goodsid} and status=1
+    </select>
+
+    <update id="updateGoods" parameterType="GoodsVO">
+        update goods set title=#{title},introduction=#{introduction},detail=#{detail},image=#{img},
+            price=#{price} where goodsid=#{goodsid}
+    </update>
+
+    <select id="selectAllIntroGoodsIntro" resultType="GoodsVO">
+        select goodsid,title,price,image as img from goods where status=1 order by goodsid desc
+    </select>
+
+    <select id="selectAllGoodsIntroBySellerView" resultType="GoodsDTO">
+        select goodsid,title,sold_quantity,price,image as img from goods where status=1 order by goodsid desc
+    </select>
+
+    <select id="selectAllGoodsIntroByCustomerView" resultType="GoodsDTO">
+        select distinct(goods.goodsid) as goodsid,goods.title as title,goods.price as price,goods.image as img,orders.itemid is not null as purchased from goods left join orders on
+        goods.goodsid=orders.goodsid and customerid=#{customerid} where goods.status=1 order by goods.goodsid desc
+    </select>
+
+    <select id="selectGoodsIntroByNotPurchasedView" resultType="GoodsDTO">
+        select distinct(goods.goodsid) as goodsid,goods.title as title,goods.price as price,goods.image as img,orders.itemid is not null as purchased from goods left join orders on
+            goods.goodsid=orders.goodsid and customerid=#{customerid} where goods.status=1 and orders.itemid is null order by goods.goodsid desc
+
+    </select>
+
+    <update id="updateStatus">
+        update goods set status=#{status} where goodsid=#{goodsid} and sellerid=#{sellerid}
+    </update>
+
+    <update id="incrementSoldQuantity">
+        update goods,shoppingcart set goods.sold_quantity=goods.sold_quantity+shoppingcart.quantity
+            where goods.goodsid=shoppingcart.goodsid and shoppingcart.customerid=#{customerid}
+    </update>
+
+</mapper>

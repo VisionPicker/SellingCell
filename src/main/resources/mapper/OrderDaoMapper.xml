@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nju.software.SellingCell.data.OrderDao">
+
+    <select id="selectOrderItem" parameterType="INT" resultType="INT">
+        select count(itemid) from orders where goodsid=#{goodsid} and customerid=#{customerid}
+    </select>
+
+    <select id="selectCartItem" resultType="CartItem">
+        select goodsid,customerid,quantity from shoppingcart where goodsid=#{goodsid} and
+            customerid=#{customerid}
+    </select>
+
+    <delete id="deleteCartItem">
+        delete from shoppingcart where customerid=#{customerid}
+            <if test="goodsid != null">
+                and goodsid=#{goodsid}
+            </if>
+    </delete>
+
+    <update id="updateCartItem" parameterType="CartItem">
+        update shoppingcart set quantity=#{quantity} where goodsid=#{goodsid} and
+            customerid=#{customerid}
+    </update>
+
+    <insert id="addCartItem" >
+        insert into shoppingcart(goodsid,customerid,quantity) values(#{goodsid},#{customerid},#{quantity})
+    </insert>
+
+    <select id="selectAllCartItem" resultType="CartItemVO">
+        select goods.goodsid as goodsid,goods.title as title,goods.image as img,goods.price as price,
+            shoppingcart.quantity as quantity from goods,shoppingcart where
+                goods.goodsid=shoppingcart.goodsid and shoppingcart.customerid = #{customerid} order by updatetime desc
+
+    </select>
+
+    <insert id="insertOrder">
+        insert into orders(orderid,sellerid,customerid,goodsid,title,price,quantity,img,item_total,ordered_time)
+            select #{orderid} as orderid,goods.sellerid as sellerid,shoppingcart.customerid as customerid,goods.goodsid as goodsid,
+                goods.title as title,goods.price as price,shoppingcart.quantity as quantity,goods.image as img,
+                    round(shoppingcart.quantity*goods.price,2) as item_total,#{ordered_time} as ordered_time
+                            from goods,shoppingcart
+                                    where shoppingcart.customerid=#{customerid} and shoppingcart.goodsid=goods.goodsid
+    </insert>
+
+    <select id="selectOrders" resultType="OrderItem">
+        select orderid,item_total,sellerid,itemid,ordered_time,title,price,quantity,img,goodsid
+            from orders where customerid=#{customerid} order by ordered_time desc,itemid desc
+    </select>
+
+</mapper>

@@ -22,15 +22,26 @@ import java.util.UUID;
 @RestController
 public class AuthorizationController{
 
-    @Value("${token_name}")
-    private static String token_name;
+
+    public static String token_name;
+    public static String user_role;
     private static Logger logger= LogManager.getLogger(AuthorizationController.class);
+
+    @Value("${token_name}")
+    public void setToken_name(String value){
+        token_name=value;
+    }
+
+    @Value("${user_role}")
+    public void setUser_role(String value){
+        user_role=value;
+    }
 
     @Autowired
     UserService userService;
 
     @RequestMapping(value="/api/login",method = RequestMethod.POST)
-    public AuthResult login(HttpServletRequest request, @RequestBody AuthRequest authRequest){
+    public Result login(HttpServletRequest request, @RequestBody AuthRequest authRequest){
         Result result = new Result();
         AuthResult authResult =new AuthResult();
         logger.info("user login request:username = "+authRequest.getUsername());
@@ -40,21 +51,21 @@ public class AuthorizationController{
         }else{
             result.setSuccess(true);
             result.setData(authResult);//设置返回值
-            authResult.setName(user.getUsername());
+            authResult.setUsername(user.getUsername());
             authResult.setRole(user.getRole());
-            authResult.setId(user.getId());
-            String token=UUID.randomUUID().toString();
+            authResult.setUserid(user.getUserid());
             HttpSession session= request.getSession();
             session.setMaxInactiveInterval(900);//设置session失效时间为15min
-            session.setAttribute(token_name, token);//装入session token
+            session.setAttribute(token_name, user.getUserid());//将用户名装入session
+            session.setAttribute(user_role,user.getRole());//将用户角色装入session
         }
-        return authResult;
+        return result;
 
 
     }
 
-    @RequestMapping(value = "/api/logout",method = RequestMethod.POST)
-    public Result logout(HttpServletRequest request, @RequestBody AuthRequest authRequest){
+    @RequestMapping(value = "/api/user/logout",method = RequestMethod.POST)
+    public Result logout(HttpServletRequest request){
         Result result=new Result();
         request.getSession().invalidate();//让session失效
         result.setSuccess(true);

@@ -4,5 +4,6 @@ import lombok.Data;
 
 public @Data class Result {
     boolean success;
+    int code;
     Object data;
 }
