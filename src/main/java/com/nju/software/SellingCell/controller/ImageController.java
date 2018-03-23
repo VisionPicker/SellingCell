@@ -1,6 +1,7 @@
 package com.nju.software.SellingCell.controller;
 
 import com.nju.software.SellingCell.controller.vo.Result;
+import com.nju.software.SellingCell.controller.vo.ResultCode;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class ImageController {
     @Value("${name_split}")
     private  String name_split;
 
-    @RequestMapping(value = "/api/images/upload",method = RequestMethod.POST)
+    @RequestMapping(value = "/api/user/seller/images/upload",method = RequestMethod.POST)
     public Result uploadImage(HttpServletRequest httpServletRequest){
         MultipartFile multipartFile;
         byte[] imageBytes=null;
@@ -44,6 +45,7 @@ public class ImageController {
         result.setData(data);
         if(!(httpServletRequest instanceof MultipartHttpServletRequest)){
             result.setSuccess(false);
+            result.setCode(ResultCode.PARAMS_INVALID);
             data.put("reason","POST REQUEST NOT MULTIPART/FORM-DATA");
             return result;
         }else{
@@ -62,6 +64,8 @@ public class ImageController {
                     result.setSuccess(true);
                     data.put("image",imageName);
                 } catch (IOException e) {
+                    result.setSuccess(false);
+                    result.setCode(ResultCode.SYSTEM_ERROR);
                     logger.error(e.getStackTrace());
 
                 }finally {

@@ -12,7 +12,7 @@ import java.util.List;
 public interface GoodsDao {
     public List<GoodsVO> selectAllIntroGoodsIntro();
 
-    public List<GoodsDTO> selectAllGoodsIntroByCustomerView(int customerId);
+    public List<GoodsDTO> selectAllGoodsIntroByCustomerView(@Param("customerid")int customerId,@Param("viewtype") int viewType);
 
     public List<GoodsDTO> selectAllGoodsIntroBySellerView();
 

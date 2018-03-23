@@ -18,15 +18,9 @@ public class OrderController{
     @Autowired
     OrderService orderService;
 
-    @RequestMapping(value = "/api/user/shoppingcart/add",method = RequestMethod.POST)
+    @RequestMapping(value = "/api/user/customer/shoppingcart/add",method = RequestMethod.POST)
     public Result addGoodsToCart(HttpServletRequest servletRequest, @RequestBody ShoppingCartItem cartItem){
         Result result=new Result();
-        String role=(String)servletRequest.getSession().getAttribute(AuthorizationController.user_role);
-        if(role=="seller"){
-            result.setSuccess(false);
-            result.setCode(ResultCode.PERMISSION_DENIED);
-            return result;
-        }
         if(cartItem.getGoodsid()<0||cartItem.getQuantity()<0){
             result.setSuccess(false);
             result.setCode(ResultCode.PARAMS_INVALID);
@@ -42,16 +36,10 @@ public class OrderController{
         return result;
     }
 
-    @RequestMapping(value = "/api/user/shoppingcart/show",method = RequestMethod.POST)
+    @RequestMapping(value = "/api/user/customer/shoppingcart/show",method = RequestMethod.POST)
     public Result showAllCartItems(HttpServletRequest servletRequest){
 
         Result result=new Result();
-        String role=(String)servletRequest.getSession().getAttribute(AuthorizationController.user_role);
-        if(role=="seller"){
-            result.setSuccess(false);
-            result.setCode(ResultCode.PERMISSION_DENIED);
-            return result;
-        }
         int userid=(Integer) servletRequest.getSession().getAttribute(AuthorizationController.token_name);
         List<ShoppingCartItemVO> list=orderService.showShoppingCart(userid);
         result.setSuccess(true);
@@ -59,15 +47,9 @@ public class OrderController{
         return result;
     }
 
-    @RequestMapping(value="/api/user/shoppingcart/balance",method=RequestMethod.POST)
+    @RequestMapping(value="/api/user/customer/shoppingcart/balance",method=RequestMethod.POST)
     public Result balance(HttpServletRequest servletRequest){
         Result result=new Result();
-        String role=(String)servletRequest.getSession().getAttribute(AuthorizationController.user_role);
-        if(role=="seller"){
-            result.setSuccess(false);
-            result.setCode(ResultCode.PERMISSION_DENIED);
-            return result;
-        }
         int userid=(Integer) servletRequest.getSession().getAttribute(AuthorizationController.token_name);
         boolean balance_result=orderService.generateOrder(userid);
         result.setSuccess(balance_result);
@@ -77,15 +59,9 @@ public class OrderController{
         return result;
     }
 
-    @RequestMapping(value = "/api/user/shoppingcart/remove/{goodsid}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/user/customer/shoppingcart/remove/{goodsid}",method = RequestMethod.DELETE)
     public Result deleteGoodsToCart(HttpServletRequest servletRequest, @PathVariable int goodsid){
         Result result=new Result();
-        String role=(String)servletRequest.getSession().getAttribute(AuthorizationController.user_role);
-        if(role=="seller"){
-            result.setSuccess(false);
-            result.setCode(ResultCode.PERMISSION_DENIED);
-            return result;
-        }
         int userid=(Integer)servletRequest.getSession().getAttribute(AuthorizationController.token_name);
         boolean success=orderService.removeCartItem(goodsid,userid);
         result.setSuccess(success);
@@ -98,12 +74,6 @@ public class OrderController{
     @RequestMapping(value = "api/user/customer/orders",method = RequestMethod.GET)
     public Result showOrders(HttpServletRequest servletRequest){
         Result result=new Result();
-        String role=(String)servletRequest.getSession().getAttribute(AuthorizationController.user_role);
-        if(role=="seller"){
-            result.setSuccess(false);
-            result.setCode(ResultCode.PERMISSION_DENIED);
-            return result;
-        }
         int userid=(Integer)servletRequest.getSession().getAttribute(AuthorizationController.token_name);
         List<OrderVO> orders=orderService.showCustomerOrder(userid);
         result.setSuccess(true);
@@ -111,15 +81,9 @@ public class OrderController{
         return result;
     }
 
-    @RequestMapping(value = "/api/user/shoppingcart/modify",method = RequestMethod.POST)
+    @RequestMapping(value = "/api/user/customer/shoppingcart/modify",method = RequestMethod.POST)
     public Result updateCartItems(HttpServletRequest servletRequest,@RequestBody ShoppingCartItem cartItem){
         Result result=new Result();
-        String role=(String)servletRequest.getSession().getAttribute(AuthorizationController.user_role);
-        if(role=="seller"){
-            result.setSuccess(false);
-            result.setCode(ResultCode.PERMISSION_DENIED);
-            return result;
-        }
         if(cartItem.getGoodsid()<0||cartItem.getQuantity()<0) {
             result.setSuccess(false);
             result.setCode(ResultCode.PARAMS_INVALID);

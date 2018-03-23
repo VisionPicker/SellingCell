@@ -25,13 +25,11 @@
 
     <select id="selectAllGoodsIntroByCustomerView" resultType="GoodsDTO">
         select distinct(goods.goodsid) as goodsid,goods.title as title,goods.price as price,goods.image as img,orders.itemid is not null as purchased from goods left join orders on
-        goods.goodsid=orders.goodsid and customerid=#{customerid} where goods.status=1 order by goods.goodsid desc
-    </select>
-
-    <select id="selectGoodsIntroByNotPurchasedView" resultType="GoodsDTO">
-        select distinct(goods.goodsid) as goodsid,goods.title as title,goods.price as price,goods.image as img,orders.itemid is not null as purchased from goods left join orders on
-            goods.goodsid=orders.goodsid and customerid=#{customerid} where goods.status=1 and orders.itemid is null order by goods.goodsid desc
-
+        goods.goodsid=orders.goodsid and customerid=#{customerid} where goods.status=1
+                <if test="viewtype==1">
+                    and orders.itemid is null
+                </if>
+                    order by goods.goodsid desc
     </select>
 
     <update id="updateStatus">

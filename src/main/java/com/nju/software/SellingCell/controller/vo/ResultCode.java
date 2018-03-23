@@ -9,4 +9,5 @@ public class ResultCode {
     public static int NO_OWNERSHIP=5;//商品不是本商家发布的
     public static int PARAMS_INVALID=6;//参数非法
     public static int SYSTEM_ERROR=7;//系统错误
+    public static int NOT_IMAGE=8;//上传的不是图片格式
 }

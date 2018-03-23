@@ -21,6 +21,10 @@ public class GoodsServiceImp implements GoodsService{
     @Autowired
     OrderDao orderDao;
 
+    static int CUSTOMER_ALL=0;
+    static int CUSTOMER_NOT_PURCHASED=1;
+    static int CUSTOMER_PURCHASED=2;
+
     @Override
     public List<GoodsVO> getAllGoodsIntroByVisitorView() {
         List<GoodsVO> list=goodsDao.selectAllIntroGoodsIntro();
@@ -32,11 +36,8 @@ public class GoodsServiceImp implements GoodsService{
 
     @Override
     public List<GoodsDTO> getAllGoodsIntroByCustomerView(int customerId) {
-        List<GoodsDTO> list=goodsDao.selectAllGoodsIntroByCustomerView(customerId);
-        if(list==null){
-            list=new LinkedList<>();
-        }
-        return list;
+        return goodsDao.selectAllGoodsIntroByCustomerView(customerId,CUSTOMER_ALL);
+
     }
 
     @Override
@@ -128,11 +129,16 @@ public class GoodsServiceImp implements GoodsService{
     @Override
     public List<GoodsDTO> getGoodsIntroByNotPurchasedView(int customerId) {
 
-        return goodsDao.selectGoodsIntroByNotPurchasedView(customerId);
+        return goodsDao.selectAllGoodsIntroByCustomerView(customerId,CUSTOMER_NOT_PURCHASED);
     }
 
+    /**
+     * 未要求
+     * @param customerId
+     * @return
+     */
     @Override
-    public List<GoodsDTO> getGoodsIntroByPurchasedView(int customerId) {
+    public List<GoodsDTO> getGoodsIntroByPurchasedView(int customerId){
         return null;
     }
 

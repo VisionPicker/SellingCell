@@ -1,5 +1,6 @@
 package com.nju.software.SellingCell.filter;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nju.software.SellingCell.controller.AuthorizationController;
 import com.nju.software.SellingCell.controller.vo.Result;
@@ -12,17 +13,13 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
-
-@WebFilter(urlPatterns = {"/api/user/*","/api/images/upload"})
-public class AuthorizationFilter implements Filter {
-    private static final Logger logger = LogManager.getLogger(AuthorizationFilter.class);
-    private static Set<String> ALLOW_URLS=new HashSet<String>(Arrays.asList());
+@WebFilter(value = {"/api/user/customer/*"})
+public class CustomerFilter implements Filter {
+    private static final Logger logger = LogManager.getLogger(CustomerFilter.class);
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
@@ -34,7 +31,9 @@ public class AuthorizationFilter implements Filter {
         HttpServletResponse httpServletResponse=(HttpServletResponse)servletResponse;
         String path = httpServletRequest.getServletPath();//获取url
         logger.info("url access: "+path);
-        if(!ALLOW_URLS.contains(path)&&StringUtils.isEmpty(((HttpServletRequest) servletRequest).getSession().getAttribute(AuthorizationController.token_name))){
+        HttpSession session=((HttpServletRequest) servletRequest).getSession();
+        String role=(String)session.getAttribute(AuthorizationController.user_role);
+        if(role==null||!role.equals("customer")){
             /*
             当不是访问/api/login的时候，需要检测有没有token，没有token直接返回success=false
             其实最好检测token的有效性，防止知道了jsessionid后就能够访问了
@@ -42,7 +41,7 @@ public class AuthorizationFilter implements Filter {
             logger.info("url: "+path+" is filtered");
             Result result=new Result();
             result.setSuccess(false);
-            result.setCode(ResultCode.NOT_AUTHORIZATION);
+            result.setCode(ResultCode.PERMISSION_DENIED);
             ObjectMapper objectMapper=new ObjectMapper();
             String jsonResult=objectMapper.writeValueAsString(result);
             servletResponse.setContentType("application/json");
@@ -60,7 +59,5 @@ public class AuthorizationFilter implements Filter {
     @Override
     public void destroy() {
 
-        System.out.println("过滤器销毁");
     }
-
 }

@@ -75,22 +75,16 @@ public class GoodsController {
 
     }
 
-    @RequestMapping(value="api/user/goods/info/customer/purchased",method = RequestMethod.GET)
+    @RequestMapping(value="api/user/customer/goods/list/purchased",method = RequestMethod.GET)
     public Result getCustomerPurchasedGoods(HttpServletRequest servletRequest){
         return null;
 
     }
 
-    @RequestMapping(value="api/user/goods/info/customer/not_purchased",method = RequestMethod.GET)
+    @RequestMapping(value="api/user/customer/goods/list/not_purchased",method = RequestMethod.GET)
     public Result getCustomerNotPurchasedGoods(HttpServletRequest servletRequest){
         Result result=new Result();
         int userid=(Integer)servletRequest.getSession().getAttribute(AuthorizationController.token_name);
-        String role=(String)servletRequest.getSession().getAttribute(AuthorizationController.user_role);
-        if(role.equals("seller")){
-            result.setSuccess(false);
-            result.setCode(ResultCode.PERMISSION_DENIED);
-            return result;
-        }
         List<GoodsDTO> list=goodsService.getGoodsIntroByNotPurchasedView(userid);
         result.setSuccess(true);
         result.setData(list);
@@ -98,40 +92,33 @@ public class GoodsController {
 
     }
 
-    @RequestMapping(value = "api/user/goods/puton")
+    @RequestMapping(value = "api/user/seller/goods/puton")
     public Result publishGoods(HttpServletRequest servletRequest,@RequestBody GoodsVO goods){
         Result result=new Result();
-        int sellerid=(Integer)servletRequest.getSession().getAttribute(AuthorizationController.token_name);
-        String role=(String)servletRequest.getSession().getAttribute(AuthorizationController.user_role);
-        if(role.equals("seller")){
-            int goodsid=goodsService.putOnGoods(sellerid,goods);
-            if(goodsid!=-1){
-                HashMap<String,Integer> hashMap=new HashMap();
-                result.setSuccess(true);
-                result.setCode(ResultCode.SUCCESS);//发布成功
-                hashMap.put("goodsid",goodsid);
-                result.setData(hashMap);
-            }else {
-                result.setSuccess(false);
-                result.setCode(ResultCode.PUTON_FAILURE);//发布失败
-            }
-        }else{
+        if(!isGoodsParamValid(goods)){
             result.setSuccess(false);
-            result.setCode(ResultCode.PERMISSION_DENIED);
+            result.setCode(ResultCode.PARAMS_INVALID);
         }
+        int sellerid=(Integer)servletRequest.getSession().getAttribute(AuthorizationController.token_name);
+        int goodsid=goodsService.putOnGoods(sellerid,goods);
+        if(goodsid!=-1){
+            HashMap<String,Integer> hashMap=new HashMap();
+            result.setSuccess(true);
+            result.setCode(ResultCode.SUCCESS);//发布成功
+            hashMap.put("goodsid",goodsid);
+            result.setData(hashMap);
+        }else {
+            result.setSuccess(false);
+            result.setCode(ResultCode.PUTON_FAILURE);//发布失败
+        }
+
         return result;
 
     }
     //商品下架
-    @RequestMapping(value = "/api/user/goods/putoff/{goodsid}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/user/seller/goods/putoff/{goodsid}",method = RequestMethod.DELETE)
     public Result putoffGoods(HttpServletRequest servletRequest,@PathVariable int goodsid){
         Result result=new Result();
-        String role=(String)servletRequest.getSession().getAttribute(AuthorizationController.user_role);
-        if(role=="customer") {
-            result.setSuccess(false);
-            result.setCode(ResultCode.PERMISSION_DENIED);
-            return result;
-        }
         GoodsDTO dto=goodsService.getGoodsDetailInfo(goodsid);
         if(dto==null||dto.getGoodsid()==-1){
             result.setSuccess(false);
@@ -148,13 +135,17 @@ public class GoodsController {
 
     }
 
-    @RequestMapping(value = "/api/user/goods/modify",method=RequestMethod.POST)
+    @RequestMapping(value = "/api/user/seller/goods/modify",method=RequestMethod.POST)
     public Result modifyGoods(@RequestBody GoodsVO goodsVO){
         Result result=new Result();
         if(goodsVO.getGoodsid()==-1){
             result.setSuccess(false);
             result.setCode(ResultCode.GOODS_NOT_EXIST);
         }else{
+            if(!isGoodsParamValid(goodsVO)){
+                result.setSuccess(false);
+                result.setCode(ResultCode.PARAMS_INVALID);
+            }
             boolean modify_result=goodsService.modifyGoodsDetailInfo(goodsVO);
             if(modify_result){
                 result.setSuccess(true);
@@ -169,5 +160,21 @@ public class GoodsController {
         return result;
     }
 
+    private boolean isGoodsParamValid(GoodsVO vo){
+        return isValid(vo.getTitle(),2,80)&&
+                isValid(vo.getIntroduction(),2,140)&&
+                isValid(vo.getDetail(),2,1000)&&
+                isValid(vo.getImg(),2,1000);
+    }
 
+    private boolean isValid(String s,int min,int max){
+        if(s==null){
+            return false;
+        }
+        s=s.trim();
+        if(s.length()>max||s.length()<min){
+            return false;
+        }
+        return true;
+    }
 }
