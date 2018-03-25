@@ -29,7 +29,7 @@ public class OrderServiceImp implements OrderService{
     GoodsDao goodsDao;
 
     @Override
-    public boolean addGoodsToShoppingcart(ShoppingCartItem cartItem) {
+    public synchronized boolean addGoodsToShoppingcart(ShoppingCartItem cartItem) {
         ShoppingCartItem existItem=orderDao.selectCartItem(cartItem.getGoodsid(),cartItem.getCustomerid());
         if(existItem!=null&&existItem.getQuantity()>0){
             cartItem.setQuantity(existItem.getQuantity()+cartItem.getQuantity());

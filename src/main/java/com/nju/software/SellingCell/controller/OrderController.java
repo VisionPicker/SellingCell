@@ -51,7 +51,11 @@ public class OrderController{
     public Result balance(HttpServletRequest servletRequest){
         Result result=new Result();
         int userid=(Integer) servletRequest.getSession().getAttribute(AuthorizationController.token_name);
-        boolean balance_result=orderService.generateOrder(userid);
+        boolean balance_result=false;
+        synchronized (this){
+            balance_result=orderService.generateOrder(userid);
+        }//锁住效率低，只有同一个用户多点操作才会出现，通过token限制用户单点登录
+        //或限制用户只能同时下一次单（设置下单标识位，方法为同步方法）应该会比较好
         result.setSuccess(balance_result);
         if(!balance_result){
             result.setCode(ResultCode.SYSTEM_ERROR);

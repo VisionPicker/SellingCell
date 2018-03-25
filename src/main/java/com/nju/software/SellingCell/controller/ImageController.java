@@ -4,6 +4,7 @@ import com.nju.software.SellingCell.controller.vo.Result;
 import com.nju.software.SellingCell.controller.vo.ResultCode;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -56,7 +57,15 @@ public class ImageController {
                 FileOutputStream outputStream=null;
                 try {
                     imageBytes=multipartFile.getBytes();
-                    String imageName=new Date().getTime()+name_split+multipartFile.getOriginalFilename();
+                    String oldName=multipartFile.getOriginalFilename();
+                    if(StringUtils.isEmpty(oldName)){
+                        result.setSuccess(false);
+                        result.setCode(ResultCode.PARAMS_INVALID);
+                        return result;
+                    }//输入参数有问题，http请求参数不正确，正常操作是不可能出现的
+                    String[] temp=oldName.split("\\.");
+                    String type=temp[temp.length-1];//获得类型名
+                    String imageName="image"+name_split+new Date().getTime()+"."+type;//新的文件名
                     File file=new File(imagesRoot+imageName);
                     outputStream=new FileOutputStream(file);
                     outputStream.write(imageBytes);
